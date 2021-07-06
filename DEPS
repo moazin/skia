@@ -44,6 +44,7 @@ deps = {
   #"third_party/externals/v8"              : "https://chromium.googlesource.com/v8/v8.git@5f1ae66d5634e43563b2d25ea652dfb94c31a3b4",
   "third_party/externals/wuffs"           : "https://skia.googlesource.com/external/github.com/google/wuffs.git@00cc8a50aa0c86b6bcb37e9ece8fb100047cc17b",
   "third_party/externals/zlib"            : "https://chromium.googlesource.com/chromium/src/third_party/zlib@c876c8f87101c5a75f6014b0f832499afeb65b73",
+  "third_party/externals/svg-native-viewer" : "https://github.com/moazin/svg-native-viewer.git@5882049420e7041a8cf9e3c1818ce429bb721e6c",
 
   "../src": {
     "url": "https://chromium.googlesource.com/chromium/src.git@5cd489ad4ec519b41cb976178c969971ca8cfd3a",

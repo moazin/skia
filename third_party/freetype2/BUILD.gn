@@ -25,7 +25,7 @@ if (skia_use_system_freetype2) {
     deps = [ "//third_party/libpng" ]
 
     include_dirs = [ "." ]
-    defines = [ "FT2_BUILD_LIBRARY" ]
+    defines = [ "FT2_BUILD_LIBRARY", "FT_CONFIG_OPTION_SVG", "FT_CONFIG_OPTION_SYSTEM_ZLIB" ]
     if (target_cpu == "wasm") {
       defines += [
         "FT_CONFIG_MODULES_H=<include/freetype-no-type1/ftmodule.h>",
@@ -42,6 +42,8 @@ if (skia_use_system_freetype2) {
       deps += [ "//third_party/brotli" ]
       defines += [ "FT_CONFIG_OPTION_USE_BROTLI" ]
     }
+
+    deps += ["//third_party/zlib"]
 
     sources = [
       "../externals/freetype/src/autofit/autofit.c",
@@ -67,10 +69,13 @@ if (skia_use_system_freetype2) {
       "../externals/freetype/src/pshinter/pshinter.c",
       "../externals/freetype/src/psnames/psnames.c",
       "../externals/freetype/src/raster/raster.c",
+      "../externals/freetype/src/svg/svg.c",
       "../externals/freetype/src/sfnt/sfnt.c",
       "../externals/freetype/src/smooth/smooth.c",
       "../externals/freetype/src/truetype/truetype.c",
       "../externals/freetype/src/type1/type1.c",
+      "../externals/freetype/include/freetype/internal/ftobjs.h",
+      "../externals/freetype/include/freetype/otsvg.h"
     ]
   }
 }
