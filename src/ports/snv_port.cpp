@@ -26,24 +26,25 @@
 #include <include/core/SkPictureRecorder.h>
 #include <include/core/SkSurface.h>
 #include <include/core/SkCanvas.h>
+#include <include/core/SkMatrix.h>
 
 FT_Error
-snv_port_init( FT_Library  library )
+snv_port_init(void **state)
 {
   /* allocate the memory upon initialization */
-  library->svg_renderer_state = malloc( sizeof( Snv_Port_StateRec ) );
+  *state = malloc( sizeof( Snv_Port_StateRec ) );
   return FT_Err_Ok;
 }
 
 void
-snv_port_free( FT_Library  library )
+snv_port_free(void *state)
 {
   /* free the memory of the state structure */
-  free( library->svg_renderer_state );
+  free( state );
 }
 
 FT_Error
-snv_port_render( FT_GlyphSlot slot )
+snv_port_render( FT_GlyphSlot slot, void *_state)
 {
   FT_Error         error = FT_Err_Ok;
   FT_SVG_Document  document       = (FT_SVG_Document)slot->other;
@@ -52,7 +53,7 @@ snv_port_render( FT_GlyphSlot slot )
   FT_UShort        end_glyph_id   = document->end_glyph_id;
   FT_UShort        start_glyph_id = document->start_glyph_id;
 
-  Snv_Port_State state = (Snv_Port_State)slot->library->svg_renderer_state;
+  Snv_Port_State state = (Snv_Port_State)_state;
   auto skImageInfo = SkImageInfo::Make(slot->bitmap.width, slot->bitmap.rows, kBGRA_8888_SkColorType, kPremul_SkAlphaType);
   auto surface = SkSurface::MakeRasterDirect(skImageInfo, slot->bitmap.buffer, slot->bitmap.pitch);
   auto canvas = surface->getCanvas();
@@ -67,7 +68,7 @@ snv_port_render( FT_GlyphSlot slot )
 }
 
 FT_Error
-snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache )
+snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache, void *_state )
 {
   FT_Error         error          = FT_Err_Ok;
   FT_SVG_Document  document       = (FT_SVG_Document)slot->other;
@@ -79,7 +80,7 @@ snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache )
   Snv_Port_State state;
 
   if (cache)
-    state = (Snv_Port_State)slot->library->svg_renderer_state;
+    state = (Snv_Port_State)_state;
   else
     state = &state_dummy;
 
@@ -95,8 +96,6 @@ snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache )
     return FT_Err_Invalid_SVG_Document;
 
   /* TODO: we need a mechanism to know if a ViewBox / Width / Height was provided or not */
-  float doc_x = snv_document->X();
-  float doc_y = snv_document->Y();
   float doc_width = snv_document->Width();
   float doc_height = snv_document->Height();
 
@@ -109,8 +108,15 @@ snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache )
   SkRect bnds{-5000, -5000, 5000, 5000};
   auto canvas = recorder.beginRecording(bnds);
   renderer->SetSkCanvas(canvas);
-  auto transform = ((SVGNative::SVGRenderer*)renderer.get())->CreateTransform(scale_x, 0, 0, scale_y, 0, 0);
-  SVGNative::Rect bounds = snv_document->Bounds(std::move(transform));
+  SVGNative::Rect bounds;
+  bool res = snv_document->GetBoundingBox(bounds);
+  SkMatrix matrix = SkMatrix::Scale(scale_x, scale_y);
+  SkRect bounds_old = SkRect::MakeXYWH(bounds.x, bounds.y, bounds.width, bounds.height);
+  bounds_old = matrix.mapRect(bounds_old);
+  bounds.x = bounds_old.x();
+  bounds.y = bounds_old.y();
+  bounds.width = bounds_old.width();
+  bounds.height = bounds_old.height();
   canvas->scale(scale_x, scale_y);
   snv_document->Render();
   auto drawable = recorder.finishRecordingAsDrawable();

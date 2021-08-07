@@ -21,15 +21,15 @@
   typedef struct Snv_Port_StateRec_*  Snv_Port_State;
 
   FT_Error
-  snv_port_init( FT_Library  library );
+  snv_port_init( void **state );
 
   void
-  snv_port_free( FT_Library  library  );
+  snv_port_free( void *state);
 
   FT_Error
-  snv_port_render( FT_GlyphSlot slot );
+  snv_port_render( FT_GlyphSlot slot, void *state );
 
   FT_Error
-  snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache );
+  snv_port_preset_slot( FT_GlyphSlot  slot, FT_Bool  cache, void *state);
 
 #endif
