@@ -1,0 +1,46 @@
+import("../../gn/skia.gni")
+import("../third_party.gni")
+
+third_party("snv") {
+  public = [
+    "./svgnative/include/svgnative/SVGDocument.h",
+    "./svgnative/include/svgnative/SVGRenderer.h",
+    "./svgnative/include/svgnative/Config.h",
+    "./svgnative/include/svgnative/ports/skia/SkiaSVGRenderer.h",
+    "./third_party/cpp-base64/base64.h",
+  ]
+  sources = [
+    "./svgnative/include/svgnative/SVGDocument.h",
+    "./svgnative/include/svgnative/ports/skia/SkiaSVGRenderer.h",
+    "./svgnative/include/svgnative/SVGRenderer.h",
+    "./svgnative/include/svgnative/Config.h",
+    "./svgnative/src/CSSColorKeywords.h",
+    "./svgnative/src/DeprecatedSVGDocumentImpl.cpp",
+    "./svgnative/src/SVGParserArcToCurve.cpp",
+    "./svgnative/src/SVGDocument.cpp",
+    "./svgnative/src/SVGStringParser.h",
+    "./svgnative/src/SVGStringParser.cpp",
+    "./svgnative/src/SVGDocumentImpl.cpp",
+    "./svgnative/src/SVGRenderer.cpp",
+    "./svgnative/src/Interval.cpp",
+    "./svgnative/src/xml/RapidXMLParser.cpp",
+    "./svgnative/src/xml/XMLParser.h",
+    "./svgnative/src/SVGNativeCWrapper.cpp",
+    "./svgnative/src/Constants.h",
+    "./svgnative/src/SVGDocumentImpl.h",
+    "./svgnative/src/Interval.h",
+    "./svgnative/src/ports/skia/SkiaSVGRenderer.cpp",
+    "./svgnative/src/ports/string/StringSVGRenderer.cpp",
+    "./third_party/cpp-base64/base64.cpp",
+  ]
+  defines = [
+    "STYLE_SUPPORT"
+  ]
+  public_include_dirs = [
+    "./svgnative/include",
+    "./svgnative/src",
+    "./third_party/stylesheet/include",
+    "./third_party/cpp-base64",
+    "./../../",
+  ]
+}
