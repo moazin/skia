@@ -1376,7 +1376,11 @@ void SkScalerContext_FreeType_Base::generateGlyphImage(
 #endif
             }
         } break;
-
+        case FT_GLYPH_FORMAT_SVG: {
+            memset(glyph.fImage, 0, glyph.rowBytes() * glyph.fHeight);
+            FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+            memcpy(glyph.fImage, face->glyph->bitmap.buffer, glyph.rowBytes() * glyph.fHeight);
+        } break;
         case FT_GLYPH_FORMAT_BITMAP: {
             FT_Pixel_Mode pixel_mode = static_cast<FT_Pixel_Mode>(face->glyph->bitmap.pixel_mode);
             SkMask::Format maskFormat = static_cast<SkMask::Format>(glyph.fMaskFormat);

@@ -31,6 +31,8 @@
 #include "src/sfnt/SkOTUtils.h"
 #include "src/utils/SkCallableTraits.h"
 #include "src/utils/SkMatrix22.h"
+#include "src/ports/snv_port.h"
+#include <freetype/otsvg.h>
 
 #include <memory>
 #include <tuple>
@@ -122,6 +124,13 @@ public:
         // Newer versions may still need this, so this test with side effects must come first.
         // The default has changed over time, so this doesn't mean the same thing to all users.
         FT_Library_SetLcdFilter(fLibrary, FT_LCD_FILTER_DEFAULT);
+
+        SVG_RendererHooks hooks;
+        hooks.init_svg = (SVG_Lib_Init_Func)snv_port_init;
+        hooks.free_svg = (SVG_Lib_Free_Func)snv_port_free;
+        hooks.render_svg = (SVG_Lib_Render_Func)snv_port_render;
+        hooks.preset_slot = (SVG_Lib_Preset_Slot_Func)snv_port_preset_slot;
+        FT_Property_Set(fLibrary, "ot-svg", "svg_hooks", &hooks);
     }
     ~FreeTypeLibrary() {
         if (fLibrary) {
@@ -1227,7 +1236,21 @@ void SkScalerContext_FreeType::generateMetrics(SkGlyph* glyph) {
         glyph->fTop    = SkToS16(top   );
         glyph->fLeft   = SkToS16(left  );
         updateGlyphIfLCD(glyph);
-
+    } else if (fFace->glyph->format == FT_GLYPH_FORMAT_SVG) {
+        if (fFace->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA) {
+            glyph->fMaskFormat = SkMask::kARGB32_Format;
+        }
+        {
+            SkRect rect = SkRect::MakeXYWH(SkIntToScalar(fFace->glyph->bitmap_left),
+                                          -SkIntToScalar(fFace->glyph->bitmap_top),
+                                           SkIntToScalar(fFace->glyph->bitmap.width),
+                                           SkIntToScalar(fFace->glyph->bitmap.rows));
+            SkIRect irect = rect.roundOut();
+            glyph->fWidth   = SkToU16(irect.width());
+            glyph->fHeight  = SkToU16(irect.height());
+            glyph->fTop     = SkToS16(irect.top());
+            glyph->fLeft    = SkToS16(irect.left());
+        }
     } else if (fFace->glyph->format == FT_GLYPH_FORMAT_BITMAP) {
         if (this->isVertical()) {
             FT_Vector vector;
@@ -1274,7 +1297,7 @@ void SkScalerContext_FreeType::generateMetrics(SkGlyph* glyph) {
             glyph->fAdvanceY = SkFDot6ToFloat(fFace->glyph->advance.y);
         }
     } else {
-        if (fDoLinearMetrics) {
+        if (fDoLinearMetrics && fFace->glyph->format != FT_GLYPH_FORMAT_SVG) {
             const SkScalar advanceScalar = SkFT_FixedToScalar(fFace->glyph->linearHoriAdvance);
             glyph->fAdvanceX = SkScalarToFloat(fMatrix22Scalar.getScaleX() * advanceScalar);
             glyph->fAdvanceY = SkScalarToFloat(fMatrix22Scalar.getSkewY() * advanceScalar);

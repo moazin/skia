@@ -1109,11 +1109,18 @@ skia_source_set("skcms") {
 optional("typeface_freetype") {
   enabled = skia_use_freetype
 
-  deps = [ "//third_party/freetype2" ]
+  deps = [ "//third_party/freetype2", "//third_party/svg-native-viewer/:snv" ]
   sources = [
     "src/ports/SkFontHost_FreeType.cpp",
     "src/ports/SkFontHost_FreeType_common.cpp",
     "src/ports/SkFontHost_FreeType_common.h",
+    "src/ports/snv_port.h",
+    "src/ports/snv_port.cpp"
+  ]
+
+  include_dirs = [
+    "./third_party/svg-native-viewer/svgnative/include",
+    "./third_party/externals/freetype/include",
   ]
 }
 

@@ -335,7 +335,7 @@ config("recover_pointer_overflow") {
 config("no_exceptions") {
   # Exceptions are disabled by default on Windows.  (Use /EHsc to enable them.)
   if (!is_win) {
-    cflags_cc = [ "-fno-exceptions" ]
+    cflags_cc = [ "" ]
   }
 }
 
@@ -572,7 +572,7 @@ config("no_rtti") {
     if (is_win) {
       cflags_cc = [ "/GR-" ]
     } else {
-      cflags_cc = [ "-fno-rtti" ]
+      cflags_cc = [ "" ]
     }
   }
 }
