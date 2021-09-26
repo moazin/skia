@@ -1119,10 +1119,10 @@ optional("typeface_freetype") {
   ]
 
   include_dirs = [
-    "./third_party/svg-native-viewer/svgnative/include",
-    "./third_party/externals/freetype/include",
+    "./third_party/svg-native-viewer/svgnative/include"
   ]
 }
+
 
 optional("webp_decode") {
   enabled = skia_use_libwebp_decode

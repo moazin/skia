@@ -17,6 +17,7 @@
 #include "src/ports/SkFontHost_FreeType_common.h"
 
 #include <utility>
+#include <stdio.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -1175,6 +1176,7 @@ void SkScalerContext_FreeType_Base::generateGlyphImage(
     const SkGlyph& glyph,
     const SkMatrix& bitmapTransform)
 {
+    printf("Generating glyph image from ot-svg new skia base\n");
     const bool doBGR = SkToBool(fRec.fFlags & SkScalerContext::kLCD_BGROrder_Flag);
     const bool doVert = SkToBool(fRec.fFlags & SkScalerContext::kLCD_Vertical_Flag);
 

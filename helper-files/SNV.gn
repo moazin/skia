@@ -36,6 +36,12 @@ third_party("snv") {
   defines = [
     "STYLE_SUPPORT"
   ]
+# These include directories may look lame but they are needed unless
+# you want to modify SVG Native Viewer to change the header paths.
+# Basically SNV includes things in the manner `#include "svgnative/ports/skia/SkiaSVGRenderer.h"
+# and it seems by default `gn` won't handle these so you'll need to add the header paths as
+# done below. You can change all includes inside SNV to the format `#include "SkiaSVGRenderer.h"`
+# and then you won't need any of the following.
   public_include_dirs = [
     "./svgnative/include",
     "./svgnative/src",
